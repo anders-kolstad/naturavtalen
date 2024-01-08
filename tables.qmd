@@ -1,0 +1,121 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+```{r}
+library(googlesheets4)
+library(kableExtra)
+library(tidyverse)
+```
+
+
+## Prioriteringsliste
+```{r}
+dat <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1dlU5Wtv3d0fqDN_4jTuNkMTLEcckNYuHB_gSp8zCKwM/edit#gid=1976769141",
+                                 sheet = "prioriteringsliste")
+```
+
+```{r}
+kbl(dat, align="ll") %>%
+   kable_classic("striped",
+                 full_width = F) %>%
+  row_spec(0, bold=T) %>%
+  save_kable("table1.jpg", 
+             zoom = 2)
+```
+
+
+## Måltekst og antall indikatorer per mål
+```{r}
+mal <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1dlU5Wtv3d0fqDN_4jTuNkMTLEcckNYuHB_gSp8zCKwM/edit#gid=1976769141",
+                                 sheet = "Måltekst")
+
+```
+
+```{r}
+mal %>%
+  select(c("Mål", "Stikkord", "Måltekst")) %>%
+  kbl(align="ll") %>%
+  kable_classic("striped",
+                 full_width = F) %>%
+  row_spec(0, bold=T) %>%
+  save_kable("maltekst.jpg", 
+             zoom = 2)
+```
+
+```{r}
+mal %>%
+  select(c("Mål", "Stikkord", "Headline", "Component", "Complementary",
+           "Miljøindikatorer", "Nasjonale målepunkt")) %>%
+  kbl(align="ll") %>%
+  kable_classic("striped",
+                 full_width = F) %>%
+ column_spec(3, color = "white",
+             background = spec_color(mal$Headline, end = 0.7)) %>%
+ column_spec(4, color = "white",
+             background = spec_color(mal$Component, end = 0.7)) %>%
+ column_spec(5, color = "white",
+             background = spec_color(mal$Complementary, end = 0.7)) %>%
+ column_spec(6, color = "white",
+             background = spec_color(mal$Miljøindikatorer, end = 0.7)) %>%
+ column_spec(7, color = "white",
+             background = spec_color(mal$`Nasjonale målepunkt`, end = 0.7)) %>%
+  row_spec(0, bold=T) %>%
+  save_kable("indikatorerPerMal.jpg", 
+             zoom = 2)
+```
+
+## Indikatorer
+
+```{r}
+ind <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1dlU5Wtv3d0fqDN_4jTuNkMTLEcckNYuHB_gSp8zCKwM/edit#gid=1976769141",
+                                 sheet = "Indikatorer",
+                                 range = "A:D",
+                                 col_types = "c")
+
+```
+Tell antall rader for hver gruppe
+```{r}
+
+hl <- nrow(ind[ind$Type=="Headline",])
+co <- nrow(ind[ind$Type=="Component",])
+cm <- nrow(ind[ind$Type=="Complementary",])
+mi <- nrow(ind[ind$Type=="Miljøindikatorer",])
+bk <- nrow(ind[ind$Type=="Bærekraftsindikatorer",])
+
+a <- hl
+b <- hl+co
+c <- b+cm
+d <- c+mi
+e <- d+bk
+```
+
+```{r}
+ind %>%
+  mutate(sortby = case_when(
+    Type == "Headline" ~ 1,
+    Type == "Component" ~2,
+    Type == "Complementary" ~ 3,
+    Type == "Miljøindikatorer" ~ 4,
+    Type == "Bærekraftsindikatorer" ~ 5
+  )) %>%
+  arrange(sortby ) %>%
+  filter(Type != "Egne forslag") %>%
+  select(c("GBF Mål", "Indikatorer")) %>%
+  kbl(align="ll",
+      booktabs = TRUE) %>%
+  kable_classic("striped",
+                 full_width = F) %>%
+  row_spec(0, bold=T) %>%
+    pack_rows("Headline indikatorer", 1, a, label_row_css = "background-color: #cef598; color: #000000;") %>%
+    pack_rows("Component indikatorer", a+1, b, label_row_css = "background-color: #cef598; color: #000000;") %>%
+    pack_rows("Complementary indikatorer", b+1,c, label_row_css = "background-color: #cef598; color: #000000;") %>%
+    pack_rows("Miljøindikatorer", c+1,d, label_row_css = "background-color: #cef598; color: #000000;") %>%
+    pack_rows("Nasjonale målepunkt", d+1,e, label_row_css = "background-color: #cef598; color: #000000;" ) #%>%
+ 
+#The table is too long for an image. Copy the text in the output and paset directly (wit formatting) into word 
+#save_kable("indikatorer.jpg", 
+ #            zoom = 2)
+```
