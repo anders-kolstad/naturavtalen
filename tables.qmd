@@ -48,16 +48,21 @@ mal %>%
 ```{r}
 options(knitr.kable.NA = '')
 mal %>%
-  select(c("Mål", "Stikkord", "Headline", "Component", "Complementary",
-           "Miljøindikatorer", "Nasjonale målepunkt")) %>%
+  select(c("Mål", 
+           "Stikkord", 
+           Hovedindikatorer = Headline, 
+           Komponentindikatorer = Component, 
+           "Komplementære indikatorer" = Complementary,
+           "Miljøindikatorer", 
+           "Bærekraftsindikatorer")) %>%
   mutate("Mål" = as.character(Mål)) %>%
   add_row("Mål" = "",
           Stikkord = "Sum",
-          Headline = sum(mal$Headline),
-          Component = sum(mal$Component),
-          Complementary = sum(mal$Complementary),
+          Hovedindikatorer = sum(mal$Headline),
+          Komponentindikatorer = sum(mal$Component),
+          "Komplementære indikatorer" = sum(mal$Complementary),
           "Miljøindikatorer" = NA,
-          "Nasjonale målepunkt" = NA) %>%
+          "Bærekraftsindikatorer" = NA) %>%
   kbl(align="ll") %>%
   kable_classic("striped",
                  full_width = F) %>%
@@ -70,7 +75,7 @@ mal %>%
  column_spec(6, color = "white",
              background = spec_color(mal$Miljøindikatorer, end = 0.7)) %>%
  column_spec(7, color = "white",
-             background = spec_color(mal$`Nasjonale målepunkt`, end = 0.7)) %>%
+             background = spec_color(mal$Bærekraftsindikatorer, end = 0.7)) %>%
   row_spec(15, background = "white", color = "black") %>%
   row_spec(0, bold=T) %>%
   save_kable("indikatorerPerMal.jpg", 
@@ -83,12 +88,12 @@ Samme tabell som over, men bare med 'tilgjengelige' indikatorer
 
 ```{r}
 mal %>%
-  select(c("Mål", "Stikkord", Headline = Headline2, Component = Component2)) %>%
+  select(c("Mål", "Stikkord", Hovedindikatorer = Headline2, Komponentindikatorer = Component2)) %>%
   mutate("Mål" = as.character(Mål)) %>%
   add_row("Mål" = "",
           Stikkord = "Sum",
-          Headline = sum(mal$Headline2),
-          Component = sum(mal$Component2)) %>%
+          Hovedindikatorer = sum(mal$Headline2),
+          Komponentindikatorer = sum(mal$Component2)) %>%
   kbl(align="ll") %>%
   kable_classic("striped",
                  full_width = F) %>%
